@@ -7,13 +7,6 @@ def sigmoid(x,turev=False):
         return x*(1-x)
     return 1/(1+np.exp(-x))
 
-def veri():
-        data = pd.read_csv('iris.csv', names=["x1", "x2", "x3", "x4", "y"])
-        x = data.iloc[:, 0:4]
-        y = data.iloc[:, 4:5].values
-        print(x.shape)
-        return x,y
-
 def geri(y,w0,w1,w2,w3,l0,l1,l2,l3,l4,rate):
     l4_error = y - l4
     l4_delta = l4_error * sigmoid(l4, turev=True)
@@ -32,12 +25,12 @@ def geri(y,w0,w1,w2,w3,l0,l1,l2,l3,l4,rate):
     w1 += l1.T.dot(l2_delta) / rate
     w0 += l0.T.dot(l1_delta) / rate
 
-def nn(x,y,dongu,rate):
+def nn(x,y,dongu,rate,errorviz=False):
     cost = np.zeros(dongu)
-    w0 = 2 * np.random.randn(4, 4) - 1
-    w1 = 2 * np.random.randn(4, 4) - 1
-    w2 = 2 * np.random.rand(4, 4) - 1
-    w3 = 2 * np.random.rand(4, 1) - 1
+    w0 = 2 * np.random.randn(x.shape[1], 4) - 1
+    w1 = 2 * np.random.randn(4,4) - 1
+    w2 = 2 * np.random.rand(4,4) - 1
+    w3 = 2 * np.random.rand(4,1) - 1
     for i in range (dongu):
         l0 = x
         l1 = sigmoid(np.dot(l0, w0))
@@ -46,10 +39,12 @@ def nn(x,y,dongu,rate):
         l4 = sigmoid(np.dot(l3, w3))
         geri(y,w0,w1,w2,w3,l0,l1,l2,l3,l4,rate)
         error = l4 - y
-        print(i, ".Epoch ", "Error:" + str(np.mean(np.abs(error))))
+        print(i,"Epoch Error:" + str(np.mean(np.abs(error))))
         cost[i] = np.mean(np.abs(error))
-    error_graph(dongu,cost)
+    if(errorviz==True):
+        error_graph(dongu,cost)
 
+    return w0,w1,w2,w3
 def error_graph(dongu,cost):
     fig, ax = plt.subplots()
     ax.plot(np.arange(dongu), cost, 'r')
@@ -58,4 +53,10 @@ def error_graph(dongu,cost):
     ax.set_title('Error vs. Training Epoch')
     plt.show()
 
-
+def tahmin(a,w0,w1,w2,w3):
+    l0 = a
+    l1 = sigmoid(np.dot(l0, w0))
+    l2 = sigmoid(np.dot(l1, w1))
+    l3 = sigmoid(np.dot(l2, w2))
+    l4 = sigmoid(np.dot(l3, w3))
+    print(l4)
